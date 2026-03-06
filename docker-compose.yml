@@ -115,3 +115,4 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
+      - ${NGINX_CACHE_LOCATION}:/cache
