@@ -72,18 +72,6 @@ services:
       - .env.nextcloud
 
 
-# -- Vaultwarden --
-
-  vaultwarden-server:
-    container_name: vaultwarden-server
-    image: vaultwarden/server:latest
-    restart: unless-stopped
-    volumes:
-      - ${VAULTWARDEN_DATA_LOCATION}:/data
-    env_file:
-      - .env.vaultwarden
-
-
 # -- Jellyfin --
 
   jellyfin-server:
@@ -98,6 +86,30 @@ services:
       - .env.jellyfin
 
 
+# -- Feishin --
+
+  feishin-server:
+    container_name: feishin-server
+    image: ghcr.io/jeffvli/feishin:latest
+    restart: unless-stopped
+    env_file:
+      - .env.feishin
+
+
+# -- Pihole --
+
+  pihole-server:
+    container_name: pihole-server
+    image: pihole/pihole:latest
+    ports:
+      - 53:53/udp
+      - 53:53/tcp
+    volumes:
+      - ${PIHOLE_DATA_LOCATION}:/etc/pihole
+    restart: unless-stopped
+    env_file:
+      - .env.pihole
+
 # -- Nginx reverse proxy for everything --
 
   nginx-proxy:
@@ -106,12 +118,17 @@ services:
     depends_on:
       - nextcloud-server
       - immich-server
-      - vaultwarden-server
       - jellyfin-server
+      - pihole-server
+      - feishin-server
     restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
+      - 443:443
+      - 80:80
+      - 81:81
+      - 82:82
+      - 83:83
+      - 84:84
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - /etc/letsencrypt:/etc/letsencrypt:ro
